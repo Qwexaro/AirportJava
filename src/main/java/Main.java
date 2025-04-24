@@ -16,10 +16,10 @@ public class Main {
         System.out.println("Count all aircraft witch found model \"" + model + "\": " +
                 findCountAircraftWithModelAirbus(airport, model));
 
-//        System.out.println("\nList flights, which through two hours: ");
-//        for (Flight currentFlight : findFlightsLeavingInTheNextHours(airport, 2)) {
-//            System.out.println("\"" + currentFlight + "\"");
-//        }
+        System.out.println("\nList flights, which through two hours: ");
+        for (Flight currentFlight : findFlightsLeavingInTheNextHours(airport, 2)) {
+            System.out.println("\"" + currentFlight + "\"");
+        }
 
         System.out.println("\nThe number of parked planes in each terminal: " +
                 findMapCountParkedAircraftByTerminalName(airport));
@@ -47,25 +47,24 @@ public class Main {
         ZonedDateTime zonedTimeNow = Instant.now().atZone(ZoneId.of("Europe/Moscow"));
         ZonedDateTime zonedTimePlusHours = zonedTimeNow.plusHours(hours);
 
+        List<Flight> listFlightsLeavingInTheNextHours = new ArrayList<>();
 
-        List<Flight> listFlightsLeavingInTheNextHour = new ArrayList<>();
         for (Terminal currentTerminal : airport.getTerminals()) {
             for (Flight currentFlight : currentTerminal.getFlights()) {
                 ZonedDateTime zonedTimeCurrentFlight = currentFlight.getDate()
                         .atZone(ZoneId.of("Europe/Moscow"));
-                if(currentFlight.getType().equals(Flight.Type.DEPARTURE) &&
+                if (currentFlight.getType().equals(Flight.Type.DEPARTURE) &&
                         (zonedTimeCurrentFlight.isEqual(zonedTimeNow) ||
                                 zonedTimeCurrentFlight.isAfter(zonedTimeNow)) &&
-                                (zonedTimeCurrentFlight.isEqual(zonedTimePlusHours) ||
-                                        zonedTimeCurrentFlight.isBefore(zonedTimePlusHours))
-
-                        ){
-                    listFlightsLeavingInTheNextHour.add(currentFlight);
+                        (zonedTimeCurrentFlight.isEqual(zonedTimePlusHours) ||
+                                zonedTimeCurrentFlight.isBefore(zonedTimePlusHours))
+                ) {
+                    listFlightsLeavingInTheNextHours.add(currentFlight);
                 }
             }
         }
 
-        return null;
+        return listFlightsLeavingInTheNextHours;
     }
 
 
@@ -75,8 +74,7 @@ public class Main {
 
         for (Terminal currentTerminal : airport.getTerminals()) {
             mapCountParkedAircraftByTerminalName.put(
-                    currentTerminal.getName(), currentTerminal.getParkedAircrafts().size()
-            );
+                    currentTerminal.getName(), currentTerminal.getParkedAircrafts().size());
         }
 
         return mapCountParkedAircraftByTerminalName;
@@ -85,16 +83,15 @@ public class Main {
 
     public static Flight findFirstFlightArriveToTerminal(Airport airport, String terminalName) {
         //TODO Найти ближайший прилет в указанный терминал.
-
         ZonedDateTime zonedDateTimeNow = Instant.now().atZone(ZoneId.of("Europe/Moscow"));
 
         Set<Flight> sortedFlights = new TreeSet<>();
 
-
         for (Terminal currentTerminal : airport.getTerminals()) {
             if (currentTerminal.getName().equals(terminalName)) {
                 for (Flight currentFlight : currentTerminal.getFlights()) {
-                    ZonedDateTime zonedTimeFlight = currentFlight.getDate().atZone(ZoneId.of("Europe/Moscow"));
+                    ZonedDateTime zonedTimeFlight = currentFlight.getDate()
+                            .atZone(ZoneId.of("Europe/Moscow"));
                     if (currentFlight.getType().equals(Flight.Type.ARRIVAL) &&
                             zonedTimeFlight.isAfter(zonedDateTimeNow)) {
                         sortedFlights.add(currentFlight);
