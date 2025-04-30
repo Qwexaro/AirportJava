@@ -3,8 +3,6 @@
 // (powered by FernFlower decompiler)
 //
 
-package library;
-
 import java.util.Objects;
 
 public class Aircraft {

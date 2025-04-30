@@ -3,9 +3,7 @@
 // (powered by FernFlower decompiler)
 //
 
-package library;
-
-import library.Flight.Type;
+//import Flight.Type;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,9 +43,9 @@ public class Airport {
             for(int i = 0; i < aircraftsCount; ++i) {
                 double type = Math.random();
                 if (type <= 0.33) {
-                    terminal.addFlight(this.generateFlight(Type.DEPARTURE));
+                    terminal.addFlight(this.generateFlight(Flight.Type.DEPARTURE));
                 } else if (type <= 0.8) {
-                    terminal.addFlight(this.generateFlight(Type.ARRIVAL));
+                    terminal.addFlight(this.generateFlight(Flight.Type.ARRIVAL));
                 } else {
                     terminal.addParkingAircraft(this.generateAircraft());
                 }

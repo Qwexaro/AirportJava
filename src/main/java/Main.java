@@ -1,13 +1,7 @@
-import library.Aircraft;
-import library.Airport;
-import library.Flight;
-import library.Terminal;
-
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
