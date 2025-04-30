@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
@@ -26,11 +25,26 @@ public class Main {
 
         System.out.println("\nFind the nearest flight to the specified terminal - A: " +
                 findFirstFlightArriveToTerminal(airport, "A"));
+
+
+        System.out.println("\nПоиск доступных полос: "); findRunway(airport);
+
+
+    }
+
+    public static void findRunway(Airport airport) {
+        Aircraft aircraftToPark = airport.getAllAircrafts().get(0);
+        Terminal terminalA = airport.getTerminals().stream()
+                .filter(t -> t.getName().equals("A"))
+                .findFirst()
+                .orElse(null);
+        if (terminalA != null) {
+            boolean parked = parkAircraftOnRunway(terminalA, aircraftToPark, "Runway-1");
+            System.out.println("Parking aircraft " + aircraftToPark.getModel() + " on runway 'Runway-1': " + (parked ? "Success" : "Failed"));
+        }
     }
 
     public static long findCountAircraftWithModelAirbus(Airport airport, String model) {
-        //TODO Метод должен вернуть количество самолетов указанной модели.
-        // подходят те самолеты, у которых name начинается со строки model
         int count = 0;
 
         for (Aircraft currentAircraft : airport.getAllAircrafts()) {
@@ -43,7 +57,6 @@ public class Main {
     }
 
     public static List<Flight> findFlightsLeavingInTheNextHours(Airport airport, int hours) {
-        //TODO Метод должен вернуть список отправляющихся рейсов в ближайшее количество часов.
         ZonedDateTime zonedTimeNow = Instant.now().atZone(ZoneId.of("Europe/Moscow"));
         ZonedDateTime zonedTimePlusHours = zonedTimeNow.plusHours(hours);
 
@@ -54,11 +67,8 @@ public class Main {
                 ZonedDateTime zonedTimeCurrentFlight = currentFlight.getDate()
                         .atZone(ZoneId.of("Europe/Moscow"));
                 if (currentFlight.getType().equals(Flight.Type.DEPARTURE) &&
-                        (zonedTimeCurrentFlight.isEqual(zonedTimeNow) ||
-                                zonedTimeCurrentFlight.isAfter(zonedTimeNow)) &&
-                        (zonedTimeCurrentFlight.isEqual(zonedTimePlusHours) ||
-                                zonedTimeCurrentFlight.isBefore(zonedTimePlusHours))
-                ) {
+                        !zonedTimeCurrentFlight.isBefore(zonedTimeNow) &&
+                        !zonedTimeCurrentFlight.isAfter(zonedTimePlusHours)) {
                     listFlightsLeavingInTheNextHours.add(currentFlight);
                 }
             }
@@ -67,9 +77,7 @@ public class Main {
         return listFlightsLeavingInTheNextHours;
     }
 
-
     public static Map<String, Integer> findMapCountParkedAircraftByTerminalName(Airport airport) {
-        //TODO Метод должен вернуть словарь с количеством припаркованных самолетов в каждом терминале.
         Map<String, Integer> mapCountParkedAircraftByTerminalName = new HashMap<>();
 
         for (Terminal currentTerminal : airport.getTerminals()) {
@@ -80,15 +88,17 @@ public class Main {
         return mapCountParkedAircraftByTerminalName;
     }
 
-
     public static Flight findFirstFlightArriveToTerminal(Airport airport, String terminalName) {
-        //TODO Найти ближайший прилет в указанный терминал.
         ZonedDateTime zonedDateTimeNow = Instant.now().atZone(ZoneId.of("Europe/Moscow"));
 
-        Set<Flight> sortedFlights = new TreeSet<>();
+        Set<Flight> sortedFlights = new TreeSet<>((f1, f2) -> {
+            int cmp = f1.getDate().compareTo(f2.getDate());
+            return cmp;
+        });
 
         for (Terminal currentTerminal : airport.getTerminals()) {
             if (currentTerminal.getName().equals(terminalName)) {
+
                 for (Flight currentFlight : currentTerminal.getFlights()) {
                     ZonedDateTime zonedTimeFlight = currentFlight.getDate()
                             .atZone(ZoneId.of("Europe/Moscow"));
@@ -100,10 +110,33 @@ public class Main {
             }
         }
 
-        for (Flight currentFlightArrival : sortedFlights) {
-            return currentFlightArrival;
+        if (!sortedFlights.isEmpty()) {
+            return sortedFlights.iterator().next();
         }
 
         return null;
+    }
+
+    public static boolean parkAircraftOnRunway(Terminal terminal, Aircraft aircraft, String runwayName) {
+        Map<String, Aircraft> runwayParking = getRunwayParkingMap(terminal);
+        if (runwayParking == null) {
+            System.out.println("Runway parking data is not available.");
+            return false;
+        }
+
+        Aircraft parkedAircraft = runwayParking.get(runwayName);
+        if (parkedAircraft != null) {
+            return false;
+        }
+
+        runwayParking.put(runwayName, aircraft);
+
+        terminal.getParkedAircrafts().add(aircraft);
+
+        return true;
+    }
+
+    private static Map<String, Aircraft> getRunwayParkingMap(Terminal terminal) {
+        return new HashMap<>();
     }
 }
