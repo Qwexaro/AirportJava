@@ -24,8 +24,8 @@ public class Main {
         System.out.println("\nThe number of parked planes in each terminal: " +
                 findMapCountParkedAircraftByTerminalName(airport));
 
-        System.out.println("\nFind the nearest flight to the specified terminal - A: " +
-                findFirstFlightArriveToTerminal(airport, "A"));
+//        System.out.println("\nFind the nearest flight to the specified terminal - A: " +
+//                findFirstFlightArriveToTerminal(airport, "A"));
     }
 
     public static long findCountAircraftWithModelAirbus(Airport airport, String model) {
@@ -81,29 +81,29 @@ public class Main {
     }
 
 
-    public static Flight findFirstFlightArriveToTerminal(Airport airport, String terminalName) {
-        //TODO Найти ближайший прилет в указанный терминал.
-        ZonedDateTime zonedDateTimeNow = Instant.now().atZone(ZoneId.of("Europe/Moscow"));
-
-        Set<Flight> sortedFlights = new TreeSet<>();
-
-        for (Terminal currentTerminal : airport.getTerminals()) {
-            if (currentTerminal.getName().equals(terminalName)) {
-                for (Flight currentFlight : currentTerminal.getFlights()) {
-                    ZonedDateTime zonedTimeFlight = currentFlight.getDate()
-                            .atZone(ZoneId.of("Europe/Moscow"));
-                    if (currentFlight.getType().equals(Flight.Type.ARRIVAL) &&
-                            zonedTimeFlight.isAfter(zonedDateTimeNow)) {
-                        sortedFlights.add(currentFlight);
-                    }
-                }
-            }
-        }
-
-        for (Flight currentFlightArrival : sortedFlights) {
-            return currentFlightArrival;
-        }
-
-        return null;
-    }
+//    public static Flight findFirstFlightArriveToTerminal(Airport airport, String terminalName) {
+//        //TODO Найти ближайший прилет в указанный терминал.
+//        ZonedDateTime zonedDateTimeNow = Instant.now().atZone(ZoneId.of("Europe/Moscow"));
+//
+//        Set<Flight> sortedFlights = new TreeSet<>();
+//
+//        for (Terminal currentTerminal : airport.getTerminals()) {
+//            if (currentTerminal.getName().equals(terminalName)) {
+//                for (Flight currentFlight : currentTerminal.getFlights()) {
+//                    ZonedDateTime zonedTimeFlight = currentFlight.getDate()
+//                            .atZone(ZoneId.of("Europe/Moscow"));
+//                    if (currentFlight.getType().equals(Flight.Type.ARRIVAL) &&
+//                            zonedTimeFlight.isAfter(zonedDateTimeNow)) {
+//                        sortedFlights.add(currentFlight);
+//                    }
+//                }
+//            }
+//        }
+//
+//        for (Flight currentFlightArrival : sortedFlights) {
+//            return currentFlightArrival;
+//        }
+//
+//        return null;
+//    }
 }
