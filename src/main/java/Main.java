@@ -27,7 +27,7 @@ public class Main {
                 findFirstFlightArriveToTerminal(airport, "A"));
 
 
-        System.out.println("\nПоиск доступных полос: "); findRunway(airport);
+        findRunway(airport);
 
 
     }
