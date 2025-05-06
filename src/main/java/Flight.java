@@ -1,75 +1,124 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Flight implements Comparable<Flight> {
-    private static final ZoneId zoneId = ZoneId.systemDefault();
-    private static final DateTimeFormatter HOUR_FORMAT;
-    private final String code;
-    private final Type type;
-    private final Instant date;
-    private final Aircraft aircraft;
+    private Aircraft aircraft; //TODO Aeroflot-Russian Airlines PJSC
+    private TypeFlight typeFlight; //TODO ARRIVAL
+    private LocalDateTime timeDeparture; //TODO 20:30
+    private LocalDateTime timeArrival; //TODO 22:10
+    private String numberFlight; //TODO SU-1177
+    private String placeForArrival; //TODO Москва/ШРМ
+    private String status; //TODO регистрация
+    private int exit; //TODO 5
 
-    public Flight(String code, Type type, Instant date, Aircraft aircraft) {
-        this.code = code;
-        this.type = type;
-        this.date = date;
+    public Flight(
+            Aircraft aircraft, TypeFlight typeFlight,
+            LocalDateTime timeDeparture, LocalDateTime timeArrival,
+            String numberFlight, String placeForArrival,
+            String status, int exit) {
         this.aircraft = aircraft;
-    }
-
-    public String getCode() {
-        return this.code;
-    }
-
-    public Type getType() {
-        return this.type;
-    }
-
-    public Instant getDate() {
-        return this.date;
+        this.typeFlight = typeFlight;
+        this.timeDeparture = timeDeparture;
+        this.timeArrival = timeArrival;
+        this.numberFlight = numberFlight;
+        this.placeForArrival = placeForArrival;
+        this.status = status;
+        this.exit = exit;
     }
 
     public Aircraft getAircraft() {
-        return this.aircraft;
+        return aircraft;
     }
 
-    public String toString() {
-        String dateFormatted = HOUR_FORMAT.format(this.date);
-        return dateFormatted + " / " + this.code + " / " + this.type;
+    public void setAircraft(Aircraft aircraft) {
+        this.aircraft = aircraft;
     }
 
-    static {
-        HOUR_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").withZone(zoneId);
+    public TypeFlight getTypeFlight() {
+        return typeFlight;
+    }
+
+    public void setTypeFlight(TypeFlight typeFlight) {
+        this.typeFlight = typeFlight;
+    }
+
+    public LocalDateTime getTimeDeparture() {
+        return timeDeparture;
+    }
+
+    public void setTimeDeparture(LocalDateTime timeDeparture) {
+        this.timeDeparture = timeDeparture;
+    }
+
+    public LocalDateTime getTimeArrival() {
+        return timeArrival;
+    }
+
+    public void setTimeArrival(LocalDateTime timeArrival) {
+        this.timeArrival = timeArrival;
+    }
+
+    public String getNumberFlight() {
+        return numberFlight;
+    }
+
+    public void setNumberFlight(String numberFlight) {
+        this.numberFlight = numberFlight;
+    }
+
+    public String getPlaceForArrival() {
+        return placeForArrival;
+    }
+
+    public void setPlaceForArrival(String placeForArrival) {
+        this.placeForArrival = placeForArrival;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getExit() {
+        return exit;
+    }
+
+    public void setExit(int exit) {
+        this.exit = exit;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Flight flight = (Flight) o;
-        return Objects.equals(code, flight.code) && type == flight.type && Objects.equals(date, flight.date) && Objects.equals(aircraft, flight.aircraft);
+        return exit == flight.exit && Objects.equals(aircraft, flight.aircraft) && typeFlight == flight.typeFlight && Objects.equals(timeDeparture, flight.timeDeparture) && Objects.equals(timeArrival, flight.timeArrival) && Objects.equals(numberFlight, flight.numberFlight) && Objects.equals(placeForArrival, flight.placeForArrival) && Objects.equals(status, flight.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(code, type, date, aircraft);
+        return Objects.hash(aircraft, typeFlight, timeDeparture, timeArrival, numberFlight, placeForArrival, status, exit);
     }
 
     @Override
-    public int compareTo(Flight o) {
-        return this.getDate().compareTo(o.getDate());
+    public int compareTo(Flight flight) {
+        return timeDeparture.compareTo(flight.timeDeparture);
     }
 
-    public static enum Type {
-        ARRIVAL,
-        DEPARTURE;
-
-        private Type() {
-        }
+    @Override
+    public String toString() {
+        return "Flight{" +
+                "aircraft=" + aircraft +
+                ", typeFlight='" + typeFlight + '\'' +
+                ", timeDeparture=" + timeDeparture +
+                ", timeArrival=" + timeArrival +
+                ", numberFlight='" + numberFlight + '\'' +
+                ", placeForArrival='" + placeForArrival + '\'' +
+                ", status='" + status + '\'' +
+                ", exit=" + exit +
+                '}';
     }
+
 }

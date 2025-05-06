@@ -1,81 +1,187 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
-//import Flight.Type;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class Airport {
-    private final Random random = new Random(1L);
-    private final List<Terminal> terminals = new ArrayList();
+    private String nameAirport;
+    private List<Aircraft> listAircraft;
+    private List<LaneForAircraft> listLanesForAircraft;
+    private List<Flight> listFlights;
+    private Map<String, Integer> mapCountParkedAircraftByTerminalName;
+    private Set<Flight> setSortedFlightsDeparture;
 
-    private Airport() {
+    public Airport(String nameAirport) {
+        this.nameAirport = nameAirport;
+        listAircraft = new ArrayList<>();
+        listLanesForAircraft = new ArrayList<>();
+        mapCountParkedAircraftByTerminalName = new TreeMap<>();
+        listFlights = new ArrayList<>();
+        setSortedFlightsDeparture = new TreeSet<>();
+        for (int i = 0; i < 160; i++) {
+            createAircraft();
+        }
+        createFlight();
+        createLanesForAircraft();
     }
 
-    public static Airport getInstance() {
-        return (new Airport()).initializeAirport();
+    public Aircraft createAircraft() {
+        AircraftModels[] arrayAircraftModels = AircraftModels.values();
+        int randomNumberForAircraftModel = (int) (Math.random() * 8);
+        AircraftModels randomAircraftModel = arrayAircraftModels[randomNumberForAircraftModel];
+        double randomAircraftLength = 20 + (int) (Math.random() * 57);
+        int randomCruisingSpeed = 200 + (int) (Math.random() * 801);
+        double randomMaxHeightFlight = (double) ((int) ((10 + (double) (Math.random() * 6)) * 10)) / 10.0;
+        int randomMaxRangeFlight = 1_000 + (int) (Math.random() * 14_001);
+        int randomCountBusinessSpaces = 8 + (int) (Math.random() * 21);
+        int randomCountEconomySpaces = 100 + (int) (Math.random() * 201);
+        Aircraft aircraft = new Aircraft(
+                randomAircraftModel,
+                randomAircraftLength,
+                randomCruisingSpeed,
+                randomMaxHeightFlight,
+                randomMaxRangeFlight,
+                randomCountBusinessSpaces,
+                randomCountEconomySpaces
+        );
+        listAircraft.add(aircraft);
+        return aircraft;
     }
 
-    public List<Aircraft> getAllAircrafts() {
-        Stream<Aircraft> usedAircraft = this.terminals.stream().map(Terminal::getFlights).flatMap(Collection::stream).map(Flight::getAircraft);
-        Stream<Aircraft> parkedAircraft = this.terminals.stream().map(Terminal::getParkedAircrafts).flatMap(Collection::stream);
-        return (List)Stream.concat(usedAircraft, parkedAircraft).collect(Collectors.toList());
+    public Flight createFlight() {
+        Aircraft randomAircraft = createAircraft();
+        int randomNumberForTypeFlight = (int) (Math.random() * 2);
+        TypeFlight typeFlight = TypeFlight.values()[randomNumberForTypeFlight];
+        int randomHour = (int) (Math.random() * 24);
+        int randomMinute = (int) (Math.random() * 60);
+        LocalDate localDateNow = LocalDate.now();
+        LocalDateTime timeDeparture = LocalDateTime.of(
+                localDateNow.getYear(), localDateNow.getMonth(), localDateNow.getDayOfMonth(),
+                randomHour, randomMinute);
+        LocalDateTime timeArrival = timeDeparture.plusHours(2);
+        String[] randomNumbersFlights = {"SU-1177", "SU-2831", "SU-1133"};
+        String randomNumberFlight = randomNumbersFlights[(int) (Math.random() * 3)];
+        String[] randomPlacesForArrival = {"Москва/ШРМ", "МОСКВА/ДМД", "Санкт-Петербург/Пулково"};
+        String randomPlaceForArrival = randomPlacesForArrival[(int) (Math.random() * 3)];
+        String[] randomStatuses = {"Регистрация", "Регистрация закончена", "Задержан"};
+        String randomStatus = randomStatuses[(int) (Math.random() * 3)];
+        int randomExit = 1 + (int) (Math.random() * 30);
+        Flight randomFlight = new Flight(
+                randomAircraft, typeFlight,
+                timeDeparture, timeArrival,
+                randomNumberFlight, randomPlaceForArrival,
+                randomStatus, randomExit
+        );
+        listFlights.add(randomFlight);
+        return randomFlight;
     }
 
-    public List<Terminal> getTerminals() {
-        return this.terminals;
-    }
-
-    private Airport initializeAirport() {
-        String[] terminalNames = new String[]{"A", "B", "C", "D"};
-        int aircraftsCount = 125 + (int) ((Math.random() - (double) 0.5F) * (double) 50.0F);
-
-        for (String terminalName : terminalNames) {
-            Terminal terminal = new Terminal(terminalName);
-
-            for(int i = 0; i < aircraftsCount; ++i) {
-                double type = Math.random();
-                if (type <= 0.33) {
-                    terminal.addFlight(this.generateFlight(Flight.Type.DEPARTURE));
-                } else if (type <= 0.8) {
-                    terminal.addFlight(this.generateFlight(Flight.Type.ARRIVAL));
-                } else {
-                    terminal.addParkingAircraft(this.generateAircraft());
-                }
+    public List<LaneForAircraft> createLanesForAircraft() {
+        String[] arrayNameLanesForAircraft = {"A", "B", "C", "D"};
+        for (String currentNameLaneForAircraft : arrayNameLanesForAircraft) {
+            LaneForAircraft currentLaneForAircraft = new LaneForAircraft(currentNameLaneForAircraft);
+            int randomCountParkedAircraft = 10 + (int) (Math.random() * 11);
+            for (int i = 0; i < randomCountParkedAircraft; i++) {
+                currentLaneForAircraft.addParkedAircraft(createAircraft());
+                currentLaneForAircraft.addFlight(createFlight());
             }
+            listLanesForAircraft.add(currentLaneForAircraft);
+        }
+        return listLanesForAircraft;
+    }
 
-            this.terminals.add(terminal);
+    /*
+    TODO Метод должен найти
+     количество припаркованных самолетов на каждой полосе
+     и вернуть такой Map
+     */
+    public Map<String, Integer> findMapCountParkedAircraftByTerminalName() {
+        for (LaneForAircraft currentLaneForAircraft : listLanesForAircraft) {
+            mapCountParkedAircraftByTerminalName.put(
+                    currentLaneForAircraft.getNameLaneForAircraft(),
+                    currentLaneForAircraft.getListParkedAircraft().size());
+        }
+        return mapCountParkedAircraftByTerminalName;
+    }
+
+    /*
+    TODO Найти кол-во самолётов с номером указанной модели
+     */
+    public int findCountAircraftWithNumberSpecifiedModel(int numberSpecifiedModelAircraft) {
+        int countAircraft = 0;
+
+        for (Aircraft currentAircraft : listAircraft) {
+            if (currentAircraft.getAircraftModel().equals(
+                    AircraftModels.values()[numberSpecifiedModelAircraft - 1])) {
+                countAircraft++;
+            }
         }
 
-        return this;
+        return countAircraft;
     }
 
-    private Flight generateFlight(Flight.Type type) {
-        return new Flight(this.generateFlightName(), type, this.generateRandomDate(), this.generateAircraft());
+    /*
+    TODO Найти ближайший рейс в указанную пользователем точку прибытия
+     */
+    public Flight findFirstFlightToSpecifiedPlaceArrival(String namePlaceForArrival) {
+        for (LaneForAircraft currentLaneForAircraft : listLanesForAircraft) {
+            for (Flight currentFlight : currentLaneForAircraft.getListFlights()) {
+                if (((currentFlight.getTimeDeparture().isAfter(LocalDateTime.now())) ||
+                        (currentFlight.getTimeDeparture().isEqual(LocalDateTime.now()))) &&
+                        (currentFlight.getTypeFlight().equals(TypeFlight.DEPARTURE)) &&
+                        (currentFlight.getPlaceForArrival().equals(namePlaceForArrival))) {
+                    setSortedFlightsDeparture.add(currentFlight);
+                }
+            }
+        }
+
+        for (Flight currentFlight : setSortedFlightsDeparture) {
+            return currentFlight;
+        }
+        return null;
     }
 
-    private Instant generateRandomDate() {
-        Instant currentTime = Instant.now();
-        return currentTime.plusMillis((long)((this.random.nextDouble() - (double)0.5F) * (double)2.0F * (double)8.64E7F));
+    /*
+    TODO Метод должен найти и вернуть список отправляющихся рейсов
+     в ближайшее количество часов,
+     в указанное место.
+     */
+    public void findListFlightsDepartureInNextCountHours(int countHours) {
+
     }
 
-    private String generateFlightName() {
-        String[] companyCodes = new String[]{"SU", "AA", "AR", "AF", "B2", "FV"};
-        String companyPrefix = companyCodes[this.random.nextInt(companyCodes.length)];
-        int routeNumber = this.random.nextInt(9999) + 1;
-        return companyPrefix + " " + routeNumber;
+    public String getNameAirport() {
+        return nameAirport;
     }
 
-    private Aircraft generateAircraft() {
-        String[] models = new String[]{"Boeing 737-200", "Boeing 737-800", "Boeing 777-200", "Airbus A-320", "Airbus A-319", "Airbus A-321"};
-        String randomModel = models[this.random.nextInt(models.length)];
-        return new Aircraft(randomModel);
+    public List<Aircraft> getListAircraft() {
+        return listAircraft;
+    }
+
+    public List<LaneForAircraft> getListLanesForAircraft() {
+        return listLanesForAircraft;
+    }
+
+    public List<Flight> getListFlights() {
+        return listFlights;
+    }
+
+    public Map<String, Integer> getMapCountParkedAircraftByTerminalName() {
+        return mapCountParkedAircraftByTerminalName;
+    }
+
+    public Set<Flight> getSetSortedFlightsDeparture() {
+        return setSortedFlightsDeparture;
+    }
+
+    @Override
+    public String toString() {
+        return "Airport{" +
+                "nameAirport='" + nameAirport + '\'' +
+                ", listAircraft=" + listAircraft +
+                ", listLanesForAircraft=" + listLanesForAircraft +
+                ", listFlights=" + listFlights +
+                ", mapCountParkedAircraftByTerminalName=" + mapCountParkedAircraftByTerminalName +
+                ", setSortedFlightsDeparture=" + setSortedFlightsDeparture +
+                '}';
     }
 }
